@@ -10,21 +10,21 @@ chmod +x dotpp.py
 ```
 
 ## Usage
-Suppose we have a file `colors.conf` with the following contents:
+Suppose we have a file `colors.conf` with the following contents.
 ```
 foreground_color #ffffff
 background_color #000000
 ```
-We want to replace `foreground_color` and `background_color` with variables, say `white` and `black`, respectively. To do this, create a new file `colors.conf.dot` with the following contents:
+We use the same `foreground_color` and `background_color` in other files though, so we want to replace `foreground_color` and `background_color` with variables, say `fg` and `bg`, respectively. To do this, create a new file `colors.conf.dot` with the following contents:
 ```
-foreground_color $$white$$
-background_color $$black$$
+foreground_color $$fg$$
+background_color $$bg$$
 ```
 and a Python file `lookup.py`:
 ```py
 lookup = {
-  "white": "#ffffff",
-  "black": #000000"
+  "fg": "#ffffff",
+  "bg": #000000"
 }
 ```
 Now run `./dotppy.py --source lookup.py --target colors.conf.dot --output colors.conf`.
