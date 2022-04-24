@@ -1,7 +1,7 @@
 # dotpreprocessor
 
 ## Motivation
-When creating settings, we often have to redefine variables that should really be centralized and shared. For example, in a terminal emulator configuration file, we might be using fonts and colors that is also used in a browser configuration file, window manager configuration file, etc. If we ever decided to change that font, we'd have to change all instances of where those variables were used.
+When creating settings, we often have to redefine variables that should really be centralized and shared. For example, in a terminal emulator configuration file, we might be using fonts and colors that is also used in a browser configuration file, window manager configuration file, etc. If we ever decided to change the font or colors, we'd have to change all instances of where those variables were used.
 
 ## Quickstart
 ```sh
