@@ -24,7 +24,7 @@ and a Python file `lookup.py`:
 ```py
 lookup = {
   "fg": "#ffffff",
-  "bg": #000000"
+  "bg": "#000000"
 }
 ```
 Now run `./dotppy.py --source lookup.py --target colors.conf.dot --output colors.conf`.
@@ -35,7 +35,7 @@ A simple script to build all `.dot` files I use in [my dotfiles](https://github.
 function build() {
   directory=`dirname $1`
   filename=`basename $1`
-  [ ${filename##*.} != dot ] && exit # ignore non .dot files
+  [ ${filename##*.} != 'dot' ] && exit # ignore non .dot files
   built="$directory/${filename::-4}"
   dotpp -s lookup.py -t $1 -o $built
   echo "built $1->$built"
