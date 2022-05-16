@@ -1,0 +1,4 @@
+$$define white #ffffff$$
+$$define dollar $$$
+white color is $$white$$
+this is a dollar sign: $$dollar$$

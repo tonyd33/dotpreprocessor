@@ -1,0 +1,125 @@
+#!/usr/bin/python
+import argparse
+import json
+import sys
+import os
+import re
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="dotpp")
+    parser.add_argument(
+        "-s",
+        "--source",
+        type=str,
+        action="store",
+        help="the .py or .json file to source variables from",
+    )
+    parser.add_argument(
+        "-t",
+        "--target",
+        type=str,
+        action="store",
+        help="the target replace variables on",
+    )
+    parser.add_argument(
+        "-j",
+        "--json",
+        action="store_true",
+        help="if provided, will generate the source to a portable JSON file",
+    )
+    parser.add_argument(
+        "-o", "--output", type=str, action="store", default=None
+    )
+
+    args = parser.parse_args()
+
+    lookup = get_lookup(args.source)
+    out = None
+    if args.json:
+        out = json.dumps(lookup, indent=2)
+    else:
+        out = preprocess(args.target, lookup)
+
+    if args.output is None:
+        sys.stdout.write(out)
+    else:
+        write(args.output, out)
+
+
+def get_lookup(file_path):
+    if file_path is None:
+        return {}
+
+    file_name, file_extension = os.path.splitext(file_path)
+    if file_extension == "json":
+        return json.load(file_path)
+    module = __import__(file_name)
+    return module.lookup
+
+
+def preprocess(file_path, lookup):
+    file = open(file_path, "r")
+    content = file.read()
+
+    content = preprocess_sources(file_path, content)
+    content, lookup = preprocess_definitions(content, lookup)
+    content = preprocess_macros(content, lookup)
+
+    file.close()
+    return content
+
+
+def preprocess_definitions(content, lookup):
+    regex = re.compile(
+        r"^\$\$define (?P<name>\b\w+\b) (?P<value>.*)\$\$$", re.M
+    )
+    next_match = regex.search(content)
+    while next_match is not None:
+        name = next_match.groupdict().get("name")
+        value = next_match.groupdict().get("value")
+        lookup[name] = value
+        content = (
+            f"{content[:next_match.start()]}{content[next_match.end()+1:]}"
+        )
+        next_match = regex.search(content)
+
+    return content, lookup
+
+
+def preprocess_macros(content, lookup):
+    for varname, value in lookup.items():
+        content = content.replace(f"$${varname}$$", value)
+    return content
+
+
+def preprocess_sources(file_path, content):
+    regex = re.compile(r"^\$\$source (?P<filename>.*)\$\$$", re.M)
+    next_match = regex.search(content)
+    while next_match is not None:
+        source_file = next_match.groupdict().get("filename")
+        source_file_real_path = ""
+
+        if os.path.isabs(source_file):
+            source_file_real_path = source_file
+        else:  # is relative path from `file_path`
+            source_file_real_path = os.path.join(
+                os.path.dirname(file_path), source_file
+            )
+
+        with open(source_file_real_path, "r") as source_fd:
+            source_file_content = source_fd.read()
+            content = f"{content[:next_match.start()]}{source_file_content}{content[next_match.end()+1:]}"
+        next_match = regex.search(content)
+
+    return content
+
+
+def write(file_path, content):
+    file = open(file_path, "w")
+    file.write(content)
+    file.close()
+
+
+if __name__ == "__main__":
+    main()

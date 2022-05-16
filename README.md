@@ -5,8 +5,8 @@ When creating settings, we often have to redefine variables that should really b
 
 ## Quickstart
 ```sh
-chmod +x dotpp.py
-./dotpp.py --source <python file with lookup dictionary> --target <file to be preprocessed>
+chmod +x dotpp
+./dotpp --source <python file with lookup dictionary> --target <file to be preprocessed>
 ```
 
 ## Usage
@@ -33,8 +33,8 @@ Now run `./dotppy.py --source lookup.py --target colors.conf.dot --output colors
 A simple script to build all `.dot` files I use in [my dotfiles](https://github.com/tonyd33/dotfiles)
 ```sh
 function build() {
-  directory=`dirname $1`
-  filename=`basename $1`
+  directory=$(dirname $1)
+  filename=$(basename $1)
   [ ${filename##*.} != 'dot' ] && exit # ignore non .dot files
   built="$directory/${filename::-4}"
   dotpp -s lookup.py -t $1 -o $built

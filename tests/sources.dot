@@ -1,0 +1,3 @@
+$$source sourcefile.dot$$
+
+print(factorial(2))
